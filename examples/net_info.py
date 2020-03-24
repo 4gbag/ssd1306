@@ -12,22 +12,22 @@ from demo_opts import device
 from oled.render import canvas
 from PIL import ImageFont
 
-def bytes2human(n):
-    """
-    >>> bytes2human(10000)
-    '9K'
-    >>> bytes2human(100001221)
-    '95M'
-    """
-    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
-    prefix = {}
-    for i, s in enumerate(symbols):
-        prefix[s] = 1 << (i + 1) * 10
-    for s in reversed(symbols):
-        if n >= prefix[s]:
-            value = int(float(n) / prefix[s])
-            return '%s%s' % (value, s)
-    return "%sB" % n
+# def bytes2human(n):
+#     """
+#     >>> bytes2human(10000)
+#     '9K'
+#     >>> bytes2human(100001221)
+#     '95M'
+#     """
+    # symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    # prefix = {}
+    # for i, s in enumerate(symbols):
+    #     prefix[s] = 1 << (i + 1) * 10
+    # for s in reversed(symbols):
+    #     if n >= prefix[s]:
+    #         value = int(float(n) / prefix[s])
+    #         return '%s%s' % (value, s)
+    # return "%.1fsB/s" % n
 
 
 def get_all_eth_traffic_info():
@@ -93,6 +93,7 @@ def network(ifaces):
         # TX = 333
         # RX = 444
         result.append("%s ↓:%.1f %s ↑:%.1f %s\n" % (_eth, RX, RX_suffix, TX, TX_suffix))
+        # result.append("%s ↓:%s ↑:%s" % (_eth, bytes2human(RX), bytes2human(TX)))
 
     return result
 
@@ -103,12 +104,6 @@ def stats(oled):
     font2 = ImageFont.truetype(font_path, 8)
 
     with canvas(oled) as draw:
-        # draw.text((0, 0), cpu_usage(), font=font2, fill="white")
-        # if device.height >= 32:
-        #     draw.text((0, 14), mem_usage(), font=font2, fill="white")
-        #
-        # if device.height >= 64:
-        #     draw.text((0, 26), disk_usage('/'), font=font2, fill="white")
         try:
             show_text = network(["wlan0"])[0]
             print(show_text)
@@ -119,16 +114,10 @@ def stats(oled):
             draw.text((0, 40), show_text, font=font2, fill="white")
             draw.text((0, 50), show_text, font=font2, fill="white")
 
-
-            # draw.text((0, 0), "The python psutil library\n"
-            #                   "(http://code.google.com/p/p\n"
-            #                   "sutil/) packaged for OpenWRT.", font=font2, fill="white")
         except KeyError:
             # no wifi enabled/available
             import traceback
             traceback.print_exc()
-            pass
-
 
 def main():
     while True:

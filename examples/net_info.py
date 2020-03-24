@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# !!! Needs psutil (+ dependencies) installing:
-#
-#    $ sudo apt-get install python-dev
-#    $ sudo pip install psutil
-#
 
 import os
 import sys
@@ -13,15 +8,9 @@ import time
 if os.name != 'posix':
     sys.exit('{} platform not supported'.format(os.name))
 
-# import psutil
-
 from demo_opts import device
 from oled.render import canvas
 from PIL import ImageFont
-
-# TODO: custom font bitmaps for up/down arrows
-# TODO: Load histogram
-
 
 def bytes2human(n):
     """

@@ -98,16 +98,20 @@ def network(ifaces):
         else:
             TX = TX / 1024
             TX_suffix = 'KB/s'
-
-        result.append("RX:%.2f %s TX:%.2f %s\n" % (RX, RX_suffix, TX, TX_suffix))
+        _eth = eth
+        if len(eth) > 3:
+            _eth = eth[0] + eth[-1]
+        # TX = 333
+        # RX = 444
+        result.append("%s ↓:%.1f %s ↑:%.1f %s\n" % (_eth, RX, RX_suffix, TX, TX_suffix))
 
     return result
 
 def stats(oled):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, 12)
+                                'fonts', 'DejaVuSans.ttf'))
+    font2 = ImageFont.truetype(font_path, 8)
 
     with canvas(oled) as draw:
         # draw.text((0, 0), cpu_usage(), font=font2, fill="white")
@@ -119,7 +123,14 @@ def stats(oled):
         try:
             show_text = network(["wlan0"])[0]
             print(show_text)
-            draw.text((0, 0), show_text + '\n' + show_text, font=font2, fill="white")
+            draw.text((0, 0), show_text, font=font2, fill="white")
+            draw.text((0, 10), show_text, font=font2, fill="white")
+            draw.text((0, 20), show_text, font=font2, fill="white")
+            draw.text((0, 30), show_text, font=font2, fill="white")
+            draw.text((0, 40), show_text, font=font2, fill="white")
+            draw.text((0, 50), show_text, font=font2, fill="white")
+
+
             # draw.text((0, 0), "The python psutil library\n"
             #                   "(http://code.google.com/p/p\n"
             #                   "sutil/) packaged for OpenWRT.", font=font2, fill="white")

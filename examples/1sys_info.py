@@ -14,7 +14,7 @@ from datetime import datetime
 if os.name != 'posix':
     sys.exit('{} platform not supported'.format(os.name))
 
-import psutil
+# import psutil
 
 from demo_opts import device
 from oled.render import canvas
@@ -43,29 +43,33 @@ def bytes2human(n):
 
 
 def cpu_usage():
+    return "cpu_usage"
     # load average, uptime
-    uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
-    av1, av2, av3 = os.getloadavg()
-    return "Ld:%.1f %.1f %.1f Up: %s" \
-        % (av1, av2, av3, str(uptime).split('.')[0])
+    # uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
+    # av1, av2, av3 = os.getloadavg()
+    # return "Ld:%.1f %.1f %.1f Up: %s" \
+    #     % (av1, av2, av3, str(uptime).split('.')[0])
 
 
 def mem_usage():
-    usage = psutil.virtual_memory()
-    return "Mem: %s %.0f%%" \
-        % (bytes2human(usage.used), 100 - usage.percent)
+    return "mem_usage"
+    # usage = psutil.virtual_memory()
+    # return "Mem: %s %.0f%%" \
+    #     % (bytes2human(usage.used), 100 - usage.percent)
 
 
 def disk_usage(dir):
-    usage = psutil.disk_usage(dir)
-    return "SD:  %s %.0f%%" \
-        % (bytes2human(usage.used), usage.percent)
+    return "disk_usage"
+    # usage = psutil.disk_usage(dir)
+    # return "SD:  %s %.0f%%" \
+    #     % (bytes2human(usage.used), usage.percent)
 
 
 def network(iface):
-    stat = psutil.net_io_counters(pernic=True)[iface]
-    return "%s: Tx%s, Rx%s" % \
-           (iface, bytes2human(stat.bytes_sent), bytes2human(stat.bytes_recv))
+    return "network"
+    # stat = psutil.net_io_counters(pernic=True)[iface]
+    # return "%s: Tx%s, Rx%s" % \
+    #        (iface, bytes2human(stat.bytes_sent), bytes2human(stat.bytes_recv))
 
 
 def stats(oled):

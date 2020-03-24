@@ -56,7 +56,6 @@ def get_all_eth_traffic_dict():
     '''
     import time
     traffic_info = get_all_eth_traffic_info().split('\n')
-    # print(len(traffic_info))
     result = {}
     for eth_traffic in traffic_info:
         _t = eth_traffic.split(' ')
@@ -65,9 +64,8 @@ def get_all_eth_traffic_dict():
         timestamp = int(time.time())
         if len(_t) != 17:
             continue
-        result[_t[0]] = {"eth":_t[0], "RX":_t[1], "TX":_t[9], "timestamp": timestamp}
-
-    # print(result)
+        # print(_t)
+        result[_t[0]] = {"eth":_t[0], "RX":int(_t[1]), "TX":int(_t[9]), "timestamp": timestamp}
     return result
 
 def network(ifaces):
@@ -79,31 +77,37 @@ def network(ifaces):
     # 获取结束流量，结束-开始=1秒内的流量，要精确的话，两个线程，一个线程获取，一个线程计算，或者协程,一个线程也行？
     traffic_info_end = get_all_eth_traffic_dict()
 
+    result = []
+    for eth in ifaces:
+        # print('I='+eth)
+        traffic_start = traffic_info_start[eth]
+        traffic_end = traffic_info_end[eth]
+        # print(traffic_start)
 
+        RX = (traffic_end['RX'] - traffic_start['RX'])
+        TX = (traffic_end['TX'] - traffic_start['TX'])
+        if RX > 1048576:
+            RX = RX / 1048576
+            RX_suffix = 'MB/s'
+        else:
+            RX = RX / 1024
+            RX_suffix = 'KB/s'
+        if TX > 1048576:
+            TX = TX / 1048576
+            TX_suffix = 'MB/s'
+        else:
+            TX = TX / 1024
+            TX_suffix = 'KB/s'
 
-    for i in ifaces:
-        # print('I='+i)
-        traffic = traffic_info[i]
-        print (traffic)
-    # with open("/proc/net/dev", "r") as f:
-    #     net_info = f.read()
-    #     print(net_info)
-    #     return f.read()
-    # print("/usr/bin/traffic_monitor.sh %s" % iface)
-    # os.system("/usr/bin/traffic_monitor.sh %s".format(iface))
-    # with open("/tmp/tmp/%s" % iface, 'r') as f:
-    #     return f.read()
-    # stat = psutil.net_io_counters(pernic=True)[iface]
-    # return "%s: Tx%s, Rx%s" % \
-    #        (iface, bytes2human(stat.bytes_sent), bytes2human(stat.bytes_recv))
+        result.append("RX:%.2f %s TX:%.2f %s\n" % (RX, RX_suffix, TX, TX_suffix))
 
-
+    return result
 
 def stats(oled):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, 10)
+    font2 = ImageFont.truetype(font_path, 12)
 
     with canvas(oled) as draw:
         # draw.text((0, 0), cpu_usage(), font=font2, fill="white")
@@ -113,21 +117,22 @@ def stats(oled):
         # if device.height >= 64:
         #     draw.text((0, 26), disk_usage('/'), font=font2, fill="white")
         try:
-            draw.text((0, 0), network("wlan0"), font=font2, fill="white")
+            show_text = network(["wlan0"])[0]
+            print(show_text)
+            draw.text((0, 0), show_text + '\n' + show_text, font=font2, fill="white")
             # draw.text((0, 0), "The python psutil library\n"
             #                   "(http://code.google.com/p/p\n"
             #                   "sutil/) packaged for OpenWRT.", font=font2, fill="white")
         except KeyError:
             # no wifi enabled/available
+            import traceback
+            traceback.print_exc()
             pass
 
 
 def main():
-    network(["wlan0"])
-    # while True:
-    #     stats(device)
-    #     time.sleep(5)
-
+    while True:
+        stats(device)
 
 if __name__ == "__main__":
     try:
